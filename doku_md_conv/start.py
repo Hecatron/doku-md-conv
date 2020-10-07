@@ -20,7 +20,7 @@ class DokuMdConv(object):
         #self.SrcDir = 'D://SourceCode//Local//WikijsSites//original-gbd-src'
         #self.DestDir = "D://SourceCode//Local//Hecatron.Local//doku-md-conv//temp1//gbd-dest"
         self.SrcDir = 'D://SourceCode//Local//WikijsSites//original-bch-src'
-        self.DestDir = "D://SourceCode//Local//Hecatron.Local//doku-md-conv//temp1//bch-dest"
+        self.DestDir = "D://SourceCode//Hecatron//doku-md-conv//temp1//bch-dest"
 
     def main(self):
 

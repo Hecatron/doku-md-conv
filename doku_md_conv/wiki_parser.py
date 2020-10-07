@@ -40,7 +40,7 @@ class WikiParser(object):
             line = self.Contents[i]
             if line.startswith('======') and line.endswith('======'):
                 line = line.replace('======', '')
-                self.PageTitle = line.replace(' ', '')
+                self.PageTitle = line.rstrip(' ').lstrip(' ')
                 self.Contents[i] = ''
                 continue
             if line.startswith('=====') and line.endswith('====='):
