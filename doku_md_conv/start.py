@@ -15,8 +15,7 @@ class DokuMdConv(object):
     '''Class for converting doku to md'''
 
     def __init__(self):
-        self.MoveStartFile = False
-        self.WikiParser = WikiParser(self.MoveStartFile)
+        self.WikiParser = WikiParser()
         #self.PandocRunner = PandocRunner()
         #self.SrcDir = 'D://SourceCode//Local//WikijsSites//original-gbd-src'
         #self.DestDir = "D://SourceCode//Hecatron//doku-md-conv//temp1//gbd-dest"
