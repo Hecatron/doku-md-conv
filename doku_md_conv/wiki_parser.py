@@ -1,15 +1,20 @@
 import os.path as path
 from datetime import datetime
+from pathlib import Path
+
+# TODO check the relative link paths for the start pages that have been moved
 
 
 class WikiParser(object):
     '''Class wrapper for running pandoc'''
 
-    def __init__(self):
+    def __init__(self, movestartfile):
         self.SrcFile = None
         self.DestFile = None
         self.Contents = None
         self.PageTitle = ''
+        self.MoveStartFile = movestartfile
+        self.IsStartFile = False
 
     def parse_file(self, srcfile, destfile):
         '''Parse a dokuwiki file'''
@@ -19,6 +24,9 @@ class WikiParser(object):
         # Read File
         with open(self.SrcFile) as _file:
             self.Contents = _file.read().splitlines()
+
+        # Relocate the start file to the upper directory and name it the same as the directory
+        self.move_startfile()
 
         # Parse File
         self.parse_headers()
@@ -33,6 +41,20 @@ class WikiParser(object):
         contents = '\n'.join(self.Contents)
         with open(self.DestFile, 'w') as _file:
             _file.write(contents)
+
+    def move_startfile(self):
+        if not self.SrcFile.endswith('start.txt'):
+            self.IsStartFile = False
+            return
+        self.IsStartFile = True
+        if not self.MoveStartFile:
+            return
+        tmp1 = path.dirname(self.SrcFile)
+        if path.exists(tmp1 + '.txt'):
+            return
+        tmp3 = path.dirname(self.DestFile) + '.md'
+        self.DestFile = tmp3
+        return
 
     def parse_headers(self):
         '''Convert the headers'''
@@ -64,8 +86,15 @@ class WikiParser(object):
         '''Add headers'''
         now = datetime.now()
         dttm = now.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        # FIXME Override for git import
+        dttm = '2020-10-07T23:07:00.000Z'
+
+        title = self.PageTitle
+        if self.IsStartFile and (not self.MoveStartFile):
+            title = 'start'
+
         header = ['---']
-        header += ['title: ' + self.PageTitle]
+        header += ['title: ' + title]
         header += ['description: ']
         header += ['published: true']
         header += ['date: ' + dttm]
@@ -150,6 +179,24 @@ class WikiParser(object):
         dest = link_arr[0]
         dest = dest.replace(':', '/')
         dest = dest.replace('http/', 'http:').replace('https/', 'https:')
+        if not (dest.startswith('http:') or dest.startswith('https:')):
+
+            # If we've moved the start page, make sure relative links still work
+            if self.IsStartFile and self.MoveStartFile and (not dest.startswith('/')):
+                tmp_base = path.basename(self.DestFile)
+                tmp_base = path.splitext(tmp_base)[0]
+
+                dest_arr = list(Path(dest).parts)
+                for i in range(len(dest_arr)):
+                    if dest_arr[i] == '.' or dest_arr[i] == '..':
+                        continue
+                    dest_arr.insert(i, tmp_base)
+                    break
+                dest = '/'.join(dest_arr)
+
+            # Make sure relative links work inside github / git
+            if not dest.endswith('.md'):
+                dest += '.md'
 
         description = ''
         if len(link_arr) > 1:
