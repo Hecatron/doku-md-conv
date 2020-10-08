@@ -2,8 +2,6 @@ import os.path as path
 from datetime import datetime
 from pathlib import Path
 
-# Todo alter headers for start pages
-
 
 class WikiParser(object):
     '''Class wrapper for running pandoc'''
