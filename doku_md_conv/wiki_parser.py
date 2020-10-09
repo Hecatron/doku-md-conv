@@ -35,6 +35,9 @@ class WikiParser(object):
         self.parse_tables()
         self.parse_links()
         self.parse_wrap()
+        self.parse_arrows()
+        self.parse_italics()
+        self.parse_fontcolor()
 
         # Write File
         contents = '\n'.join(self.Contents)
@@ -243,4 +246,34 @@ class WikiParser(object):
                 continue
             if inside_wrap_blk:
                 line = '> ' + line
+                self.Contents[i] = line
+
+    def parse_arrows(self):
+        '''Parse wrap statements'''
+        for i in range(len(self.Contents)):
+            line = self.Contents[i]
+            #if 'Browse to Computer Configuration' in line:
+            #    if r'â†’' in line:
+            #        print('test')
+
+            if r'â†’' in line:
+                line = line.replace(r'â†’', '->')
+                self.Contents[i] = line
+
+    def parse_italics(self):
+        for i in range(len(self.Contents)):
+            line = self.Contents[i]
+            if 'http://' in line or 'https://' in line:
+                continue
+            while line.count('//') > 1:
+                line = line.replace('//', '<em>', 1)
+                line = line.replace('//', '</em>', 1)
+            self.Contents[i] = line
+
+    def parse_fontcolor(self):
+        for i in range(len(self.Contents)):
+            line = self.Contents[i]
+            if '</fc>' in line or '<fc #FF0000>' in line:
+                line = line.replace('<fc #FF0000>', '<span style="color:red">')
+                line = line.replace('</fc>', '</span>')
                 self.Contents[i] = line
